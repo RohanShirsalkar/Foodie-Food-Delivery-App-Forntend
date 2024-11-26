@@ -1,8 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const RestaurantCard = ({
   restaurant = {
-    id: 1,
+    id: "be93ebfb-b1ef-4e4f-95c1-54d1b35cce90",
     name: "Pizza Palace",
     rating: 4.5,
     cuisine: "Italian",
@@ -11,8 +12,12 @@ const RestaurantCard = ({
     image: "https://via.placeholder.com/300x200",
   },
 }) => {
+  const navigate = useNavigate();
   return (
-    <div className="bg-white border rounded-lg shadow-md hover:shadow-lg transition duration-300">
+    <div
+      onClick={() => navigate(`restaurant/${restaurant.id}`)}
+      className="bg-white border rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer"
+    >
       {/* Restaurant Image */}
       <img
         className="w-full h-48 object-cover rounded-t-lg"

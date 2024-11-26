@@ -1,17 +1,37 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import MenuItem from "../components/restaurant_page/MenuItem";
+import { getRestaurantById } from "../api/restaurant.api";
+import { useParams } from "react-router-dom";
+import { CartContext } from "../context/CartContext";
 
 const Restaurant_Page = () => {
-  const restaurant = {
-    name: "Pizza Palace",
-    image:
-      "https://b.zmtcdn.com/data/pictures/4/21456784/f2025295e6b20c69ab8109473ba28176_featured_v2.jpg",
-    rating: 4.5,
-    cuisine: "Italian",
-    location: "123 Main St, Food City",
-    deliveryTime: 30,
-    costForTwo: 500,
-  };
+  const { addItemToCart, cartId } = useContext(CartContext);
+  const [restaurant, setRestaurant] = useState({});
+  const { id } = useParams();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getRestaurantById(id);
+        setRestaurant(response.data);
+      } catch (error) {
+        console.log(error);
+        alert("Error fetching restaurantById");
+      }
+    };
+    fetchData();
+  }, []);
+
+  // const restaurant = {
+  //   name: "Pizza Palace",
+  //   image:
+  //     "https://b.zmtcdn.com/data/pictures/4/21456784/f2025295e6b20c69ab8109473ba28176_featured_v2.jpg",
+  //   rating: 4.5,
+  //   cuisine: "Italian",
+  //   location: "123 Main St, Food City",
+  //   deliveryTime: 30,
+  //   costForTwo: 500,
+  // };
 
   const menuItems = [
     {
@@ -39,10 +59,6 @@ const Restaurant_Page = () => {
         "https://plus.unsplash.com/premium_photo-1675252369719-dd52bc69c3df?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
   ];
-
-  const handleAddToCart = (item) => {
-    alert(`${item.name} added to cart!`);
-  };
 
   return (
     <div className="py-6">
@@ -84,11 +100,18 @@ const Restaurant_Page = () => {
         <div>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">Menu</h3>
           <div className="divide-y divide-gray-200 space-y-2">
-            {menuItems.map((item) => (
+            {restaurant?.menu?.map((item) => (
               <MenuItem
                 key={item.id}
                 item={item}
-                onAddToCart={handleAddToCart}
+                onAddToCart={() =>
+                  addItemToCart({
+                    cartId: cartId,
+                    menuItemId: item.id,
+                    restaurantId: id,
+                    quantity: 1,
+                  })
+                }
               />
             ))}
           </div>

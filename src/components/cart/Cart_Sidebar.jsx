@@ -1,12 +1,19 @@
-import React from "react";
+import { useContext } from "react";
+import { CartContext } from "../../context/CartContext";
+import { deleteAllCartItemsByCartId } from "../../api/cart.api";
 
-const Cart_Sidebar = ({
-  cartItems,
-  totalPrice,
-  onClearCart,
-  onCheckout,
-  toggleCart,
-}) => {
+const Cart_Sidebar = () => {
+  const {
+    cartId,
+    cartItems,
+    totalPrice,
+    clearCart,
+    onCheckout,
+    toggleCart,
+    removeItemFromCart,
+    decreaseItemQuantity,
+    increaseItemQuantity,
+  } = useContext(CartContext);
   return (
     <div className="fixed right-0 top-0 w-[35%] h-full bg-white shadow-md p-4 z-50">
       {/* <h2 className="text-2xl font-bold mb-4">Your Cart</h2> */}
@@ -20,12 +27,12 @@ const Cart_Sidebar = ({
         </button>
       </div>
 
-      {cartItems.length === 0 ? (
+      {cartItems?.length === 0 ? (
         <p className="text-center text-gray-500">Your cart is empty</p>
       ) : (
         <div>
           <ul className="space-y-4">
-            {cartItems.map((item) => (
+            {cartItems?.map((item) => (
               <li key={item.id} className="flex items-center justify-between">
                 {/* Item Details */}
                 <div className="flex items-center space-x-2">
@@ -45,20 +52,20 @@ const Cart_Sidebar = ({
                 {/* Item Controls */}
                 <div className="flex items-center space-x-2">
                   <button
-                    // onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                    onClick={() => decreaseItemQuantity(item)}
                     className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
                   >
                     -
                   </button>
                   <span className="text-gray-800">{item.quantity}</span>
                   <button
-                    // onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    onClick={() => increaseItemQuantity(item)}
                     className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
                   >
                     +
                   </button>
                   <button
-                    // onClick={() => removeItem(item.id)}
+                    onClick={() => removeItemFromCart(item.id)}
                     className="text-red-600 hover:text-red-800"
                   >
                     🗑
@@ -82,7 +89,7 @@ const Cart_Sidebar = ({
               Checkout
             </button>
             <button
-              onClick={onClearCart}
+              onClick={() => clearCart(cartId)}
               className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 w-full"
             >
               Clear Cart

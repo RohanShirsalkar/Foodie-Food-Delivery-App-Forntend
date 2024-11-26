@@ -1,67 +1,91 @@
 import { useState, createContext } from "react";
+import {
+  deleteCartItemById,
+  createCartItem,
+  updateCartItemById,
+  deleteAllCartItemsByCartId,
+} from "../api/cart.api";
 
 export const CartContext = createContext();
 
 export const CartContextProvider = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Margherita Pizza",
-      image: "https://via.placeholder.com/150?text=Pizza",
-      price: 10.99,
-      quantity: 2,
-    },
-    {
-      id: 2,
-      name: "Veggie Burger",
-      image: "https://via.placeholder.com/150?text=Burger",
-      price: 8.49,
-      quantity: 1,
-    },
-    {
-      id: 3,
-      name: "Pasta Alfredo",
-      image: "https://via.placeholder.com/150?text=Pasta",
-      price: 12.79,
-      quantity: 1,
-    },
-    {
-      id: 3,
-      name: "Pasta Alfredo",
-      image: "https://via.placeholder.com/150?text=Pasta",
-      price: 12.79,
-      quantity: 1,
-    },
-    {
-      id: 3,
-      name: "Pasta Alfredo",
-      image: "https://via.placeholder.com/150?text=Pasta",
-      price: 12.79,
-      quantity: 1,
-    },
-  ]);
+  const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [cartId, setCartId] = useState(null);
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
   };
 
-  // Sample function to add items to the cart
-  const addItemToCart = (item) => {
-    setCartItems([...cartItems, item]);
-    setTotalPrice(totalPrice + item.price);
+  const addItemToCart = async (data) => {
+    try {
+      const response = await createCartItem(data);
+      setCart(response.data);
+    } catch (error) {
+      console.log(error);
+      alert("Error adding item to cart");
+    }
   };
 
-  // Sample function to clear cart
-  const clearCart = () => {
-    setCartItems([]);
-    setTotalPrice(0);
+  const increaseItemQuantity = async (item) => {
+    try {
+      const response = await updateCartItemById(item.id, {
+        quantity: item.quantity + 1,
+      });
+      setCart(response.data);
+    } catch (error) {
+      console.log(error);
+      alert("Error adding item to cart");
+    }
+  };
+
+  const decreaseItemQuantity = async (item) => {
+    if (item.quantity > 1) {
+      try {
+        const response = await updateCartItemById(item.id, {
+          quantity: item.quantity - 1,
+        });
+        setCart(response.data);
+      } catch (error) {
+        console.log(error);
+        alert("Error adding item to cart");
+      }
+    } else {
+      alert("Cannot decrease quantity more than one.");
+    }
+  };
+
+  const clearCart = async (id) => {
+    try {
+      const response = await deleteAllCartItemsByCartId(id);
+      setCart(response.data);
+    } catch (error) {
+      console.log(error);
+      alert("Error clearing cart");
+    }
   };
 
   const proceedToCheckout = () => {
     alert("Proceeding to checkout...");
-    clearCart(); // Clear cart after checkout
+    clearCart();
+  };
+
+  const setCart = (cart) => {
+    setCartItems(cart.cartItem);
+    setCartId(cart.id);
+    setTotalPrice(cart.total);
+  };
+
+  const removeItemFromCart = async (itemId) => {
+    try {
+      const response = await deleteCartItemById(itemId);
+      setCartItems(response.data.cartItem);
+      console.log("delete res", response.data);
+    } catch (error) {
+      console.log(error);
+      alert("Error while removing item from cart");
+    }
   };
 
   const value = {
@@ -72,6 +96,11 @@ export const CartContextProvider = ({ children }) => {
     addItemToCart,
     clearCart,
     proceedToCheckout,
+    cartId,
+    setCart,
+    removeItemFromCart,
+    increaseItemQuantity,
+    decreaseItemQuantity,
   };
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
