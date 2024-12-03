@@ -1,10 +1,13 @@
-import { useState, createContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 import {
   deleteCartItemById,
   createCartItem,
   updateCartItemById,
   deleteAllCartItemsByCartId,
+  findCartByUserId,
 } from "../api/cart.api";
+import { UserContext } from "./UserContext";
+import { useNavigate } from "react-router-dom";
 
 export const CartContext = createContext();
 
@@ -13,6 +16,24 @@ export const CartContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [cartId, setCartId] = useState(null);
+  const [restaurantId, setRestaurantId] = useState("");
+
+  const navigate = useNavigate();
+
+  const { userId } = useContext(UserContext);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await findCartByUserId(userId);
+        setCart(response.data);
+      } catch (error) {
+        console.log(error);
+        alert("Error fetching cart data.");
+      }
+    };
+    fetchData();
+  }, []);
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
@@ -66,15 +87,18 @@ export const CartContextProvider = ({ children }) => {
     }
   };
 
-  const proceedToCheckout = () => {
-    alert("Proceeding to checkout...");
-    clearCart();
+  const proceedToCheckout = async (data) => {
+    navigate("order-overview/2");
+    setIsCartOpen(false);
   };
 
   const setCart = (cart) => {
     setCartItems(cart.cartItem);
     setCartId(cart.id);
     setTotalPrice(cart.total);
+    if (cart?.cartItem[0]?.restaurantId) {
+      setRestaurantId(cart.cartItem[0].restaurantId);
+    }
   };
 
   const removeItemFromCart = async (itemId) => {
@@ -101,6 +125,7 @@ export const CartContextProvider = ({ children }) => {
     removeItemFromCart,
     increaseItemQuantity,
     decreaseItemQuantity,
+    restaurantId,
   };
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };

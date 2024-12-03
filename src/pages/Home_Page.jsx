@@ -22,11 +22,9 @@ const Home_Page = () => {
   return (
     <div className="py-6">
       <div className="grid md:grid-cols-3 gap-4">
-        <RestaurantCard />
-        <RestaurantCard />
-        <RestaurantCard />
-        <RestaurantCard />
-        <RestaurantCard />
+        {restaurants?.map((item) => (
+          <RestaurantCard key={item.id} restaurant={item} />
+        ))}
       </div>
     </div>
   );

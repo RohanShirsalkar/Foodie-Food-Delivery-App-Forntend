@@ -1,51 +1,104 @@
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import AddressSelector from "../components/order_overvier_page/AddressSelector";
+import { CartContext } from "../context/CartContext";
+import { getAddressesByUserId } from "../api/address.api";
+import { UserContext } from "../context/UserContext";
+import { createOrder } from "../api/order.api";
+import { useNavigate } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
+import PaymentSelector from "../components/order_overvier_page/PaymentSelector";
+import CouponSelector from "../components/order_overvier_page/CouponSelector";
 
 const Order_Overview_Page = () => {
-  const [cartItems, setCartItems] = useState([
-    { id: 1, name: "Margherita Pizza", quantity: 2, price: 10.99 },
-    { id: 2, name: "Veggie Burger", quantity: 1, price: 8.49 },
-    { id: 3, name: "Pasta Alfredo", quantity: 1, price: 12.79 },
-  ]);
+  const { userId } = useContext(UserContext);
+  const {
+    cartItems,
+    totalPrice,
+    removeItemFromCart,
+    increaseItemQuantity,
+    decreaseItemQuantity,
+    restaurantId,
+    setCart,
+  } = useContext(CartContext);
+  const { addresses, setAddresses } = useContext(AppContext);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [selectedMethod, setSelectedMethod] = useState(null);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [grandTotal, setGrandTotal] = useState(0);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const deliveryFee = 50;
+  const navigate = useNavigate();
 
-  const deliveryFee = 4.99;
+  useEffect(() => {
+    if (!totalPrice) {
+      return;
+    }
+    if (selectedCoupon) {
+      if (selectedCoupon?.discountType === "AMOUNT") {
+        setCouponDiscount(selectedCoupon.discount);
+        setGrandTotal(totalPrice - selectedCoupon.discount + deliveryFee);
+      } else {
+        let couponDiscount = totalPrice * (selectedCoupon?.discount / 100);
+        setCouponDiscount(couponDiscount);
+        setGrandTotal(totalPrice - couponDiscount + deliveryFee);
+      }
+    } else {
+      console.log(totalPrice, deliveryFee, totalPrice + deliveryFee);
+      setGrandTotal(totalPrice + deliveryFee);
+    }
+  }, [selectedCoupon, totalPrice]);
 
-  const updateQuantity = (id, action) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              quantity:
-                action === "increase"
-                  ? item.quantity + 1
-                  : item.quantity > 1
-                  ? item.quantity - 1
-                  : 1,
-            }
-          : item
-      )
-    );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getAddressesByUserId(userId);
+        setAddresses(response.data);
+      } catch (error) {
+        console.log(error);
+        alert("Error fetching addresses");
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handlePlaceOrder = async () => {
+    if (!selectedMethod) {
+      alert("Please select a delivery method");
+      return;
+    }
+    if (!selectedAddressId) {
+      alert("Please select an address");
+      return;
+    }
+    try {
+      const response = await createOrder({
+        userId,
+        restaurantId,
+        paymentMethod: selectedMethod,
+        deliveryCharges: deliveryFee,
+        addressId: selectedAddressId,
+        couponId: selectedCoupon.id,
+      });
+      alert("Order placed successfully");
+      setCart(response.data.updatedCart);
+      navigate(`/order-confirm/${response.data.updatedOrder.id}`);
+    } catch (error) {
+      console.log(error);
+      alert("Error placing order");
+    }
+  };
+  const handleCouponSelect = (coupon) => {
+    alert(`${coupon.code} Coupon Applied`);
+    // Logic to apply the selected coupon
   };
 
-  const removeItem = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
-  const total = subtotal + deliveryFee;
-
-  const handlePlaceOrder = () => {
-    alert("Order placed successfully!");
-    // Redirect to order summary or home
+  const handlePaymentSelect = (method) => {
+    alert(`Payment method selected: ${method}`);
+    // Proceed to payment logic here
   };
 
   return (
     <div className="min-h-screen pb-6">
-      {/* Header Section */}
       <div className="flex items-center space-x-4 mb-6 pt-6">
         <button
           onClick={() => alert("Navigate back to menu")}
@@ -54,15 +107,13 @@ const Order_Overview_Page = () => {
           &larr; Back
         </button>
         <h1 className="text-2xl font-bold">Review Your Order</h1>
-        <div></div> {/* Empty div for layout alignment */}
       </div>
 
-      {/* Order Items Section */}
       <div className="bg-white shadow-md rounded-lg p-6 mb-6">
         <h2 className="text-xl font-bold mb-4">Your Items</h2>
-        {cartItems.length > 0 ? (
+        {cartItems?.length > 0 ? (
           <ul className="space-y-4">
-            {cartItems.map((item) => (
+            {cartItems?.map((item) => (
               <li
                 key={item.id}
                 className="flex justify-between items-center bg-gray-100 p-4 rounded-lg"
@@ -74,14 +125,14 @@ const Order_Overview_Page = () => {
                   </p>
                   <div className="mt-2 flex items-center space-x-2">
                     <button
-                      onClick={() => updateQuantity(item.id, "decrease")}
+                      onClick={() => decreaseItemQuantity(item)}
                       className="bg-gray-300 text-gray-700 px-2 rounded hover:bg-gray-400"
                     >
                       -
                     </button>
                     <span>{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.id, "increase")}
+                      onClick={() => increaseItemQuantity(item)}
                       className="bg-gray-300 text-gray-700 px-2 rounded hover:bg-gray-400"
                     >
                       +
@@ -89,7 +140,7 @@ const Order_Overview_Page = () => {
                   </div>
                 </div>
                 <button
-                  onClick={() => removeItem(item.id)}
+                  onClick={() => removeItemFromCart(item.id)}
                   className="bg-red-500 text-white px-4 py-1 rounded-lg hover:bg-red-600"
                 >
                   Remove
@@ -102,32 +153,50 @@ const Order_Overview_Page = () => {
         )}
       </div>
 
-      {/*  */}
+      <AddressSelector
+        addresses={addresses}
+        selectedAddressId={selectedAddressId}
+        setSelectedAddressId={setSelectedAddressId}
+      />
 
-      <AddressSelector />
+      <CouponSelector
+        onCouponSelect={handleCouponSelect}
+        selectedCoupon={selectedCoupon}
+        setSelectedCoupon={setSelectedCoupon}
+      />
 
-      {/* Order Summary Section */}
+      <PaymentSelector
+        onPaymentSelect={handlePaymentSelect}
+        selectedMethod={selectedMethod}
+        setSelectedMethod={setSelectedMethod}
+      />
+
       <div className="pt-6">
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
           <h2 className="text-xl font-bold mb-4">Order Summary</h2>
           <div className="space-y-2">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>${totalPrice}</span>
             </div>
+            {selectedCoupon && (
+              <div className="flex justify-between text-green-600">
+                <span>Coupon Discount</span>
+                <span>${couponDiscount}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span>Delivery Fee</span>
-              <span>${deliveryFee.toFixed(2)}</span>
+              <span>${deliveryFee}</span>
             </div>
             <div className="border-t pt-2 flex justify-between font-bold">
               <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>${grandTotal}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Call-to-Action */}
       <div className="space-x-2">
         <button
           onClick={handlePlaceOrder}

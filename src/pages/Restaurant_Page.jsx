@@ -22,44 +22,6 @@ const Restaurant_Page = () => {
     fetchData();
   }, []);
 
-  // const restaurant = {
-  //   name: "Pizza Palace",
-  //   image:
-  //     "https://b.zmtcdn.com/data/pictures/4/21456784/f2025295e6b20c69ab8109473ba28176_featured_v2.jpg",
-  //   rating: 4.5,
-  //   cuisine: "Italian",
-  //   location: "123 Main St, Food City",
-  //   deliveryTime: 30,
-  //   costForTwo: 500,
-  // };
-
-  const menuItems = [
-    {
-      id: 1,
-      name: "Margherita Pizza",
-      description: "Classic cheese pizza",
-      price: 299,
-      image:
-        "https://plus.unsplash.com/premium_photo-1675252369719-dd52bc69c3df?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-      id: 2,
-      name: "Pepperoni Pizza",
-      description: "Loaded with pepperoni",
-      price: 399,
-      image:
-        "https://plus.unsplash.com/premium_photo-1675252369719-dd52bc69c3df?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-      id: 3,
-      name: "Garlic Bread",
-      description: "Crispy garlic bread",
-      price: 149,
-      image:
-        "https://plus.unsplash.com/premium_photo-1675252369719-dd52bc69c3df?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-  ];
-
   return (
     <div className="py-6">
       {/* Hero Section */}

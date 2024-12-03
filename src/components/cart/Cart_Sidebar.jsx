@@ -1,19 +1,21 @@
 import { useContext } from "react";
 import { CartContext } from "../../context/CartContext";
-import { deleteAllCartItemsByCartId } from "../../api/cart.api";
+import { useNavigate } from "react-router-dom";
 
 const Cart_Sidebar = () => {
+  const navigate = useNavigate();
   const {
     cartId,
     cartItems,
     totalPrice,
     clearCart,
-    onCheckout,
     toggleCart,
+    proceedToCheckout,
     removeItemFromCart,
     decreaseItemQuantity,
     increaseItemQuantity,
   } = useContext(CartContext);
+
   return (
     <div className="fixed right-0 top-0 w-[35%] h-full bg-white shadow-md p-4 z-50">
       {/* <h2 className="text-2xl font-bold mb-4">Your Cart</h2> */}
@@ -83,7 +85,7 @@ const Cart_Sidebar = () => {
               </span>
             </div>
             <button
-              onClick={onCheckout}
+              onClick={proceedToCheckout}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full mb-2"
             >
               Checkout

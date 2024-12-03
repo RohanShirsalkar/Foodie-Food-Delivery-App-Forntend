@@ -1,17 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const RestaurantCard = ({
-  restaurant = {
-    id: "be93ebfb-b1ef-4e4f-95c1-54d1b35cce90",
-    name: "Pizza Palace",
-    rating: 4.5,
-    cuisine: "Italian",
-    costForTwo: 500,
-    deliveryTime: 30,
-    image: "https://via.placeholder.com/300x200",
-  },
-}) => {
+const RestaurantCard = ({ restaurant }) => {
   const navigate = useNavigate();
   return (
     <div
