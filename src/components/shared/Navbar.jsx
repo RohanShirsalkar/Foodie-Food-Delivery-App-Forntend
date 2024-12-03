@@ -1,7 +1,11 @@
 import React, { useContext, useState } from "react";
 import { CartContext } from "../../context/CartContext";
+import { AppContext } from "../../context/AppContext";
+import { UserContext } from "../../context/UserContext";
 
 const Navbar = () => {
+  const { openAuthDialog } = useContext(AppContext);
+  const { userPhone, loggedIn, logout } = useContext(UserContext);
   const { toggleCart } = useContext(CartContext);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -28,7 +32,7 @@ const Navbar = () => {
               href="/"
               className="text-gray-800 font-medium hover:text-blue-500"
             >
-              Home
+              📍Select Location
             </a>
             <a
               className="text-gray-800 font-medium hover:text-blue-500 cursor-pointer"
@@ -36,12 +40,21 @@ const Navbar = () => {
             >
               Cart
             </a>
-            <a
-              href="/contact"
-              className="text-gray-800 font-medium hover:text-blue-500"
-            >
-              Sign in
-            </a>
+            {loggedIn ? (
+              <a
+                onClick={logout}
+                className="text-gray-800 font-medium hover:text-blue-500 cursor-pointer"
+              >
+                +91 {userPhone} Logout
+              </a>
+            ) : (
+              <a
+                onClick={openAuthDialog}
+                className="text-gray-800 font-medium hover:text-blue-500 cursor-pointer"
+              >
+                Sign in
+              </a>
+            )}
           </div>
 
           {/* Mobile Menu Button */}

@@ -5,6 +5,7 @@ import { UserContextProvider } from "../context/UserContext";
 import Cart_Container from "../components/cart/Cart_Container";
 import Address_Container from "../components/address_dialog/Address_Container";
 import { AppContextProvider } from "../context/AppContext";
+import Auth_Container from "../components/auth_dialog/Auth_Container";
 
 const Layout = () => {
   return (
@@ -15,6 +16,7 @@ const Layout = () => {
             <Navbar />
             <Cart_Container />
             <Address_Container />
+            <Auth_Container />
             <div className="md:max-w-7xl max-w-full px-4 md:px-6 mx-auto">
               <Outlet />
             </div>

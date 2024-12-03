@@ -20,7 +20,7 @@ export const CartContextProvider = ({ children }) => {
 
   const navigate = useNavigate();
 
-  const { userId } = useContext(UserContext);
+  const { userId, loggedIn } = useContext(UserContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,17 +32,29 @@ export const CartContextProvider = ({ children }) => {
         alert("Error fetching cart data.");
       }
     };
-    fetchData();
-  }, []);
+    if (loggedIn) {
+      fetchData();
+    } else {
+      setCartItems([]);
+      setCartId(null);
+      setTotalPrice(0);
+      setRestaurantId("");
+    }
+  }, [userId, loggedIn]);
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
   };
 
   const addItemToCart = async (data) => {
+    if (!loggedIn) {
+      alert("Please sign in to add items");
+      return;
+    }
     try {
       const response = await createCartItem(data);
       setCart(response.data);
+      alert("Item added successfully");
     } catch (error) {
       console.log(error);
       alert("Error adding item to cart");
@@ -105,7 +117,6 @@ export const CartContextProvider = ({ children }) => {
     try {
       const response = await deleteCartItemById(itemId);
       setCartItems(response.data.cartItem);
-      console.log("delete res", response.data);
     } catch (error) {
       console.log(error);
       alert("Error while removing item from cart");
