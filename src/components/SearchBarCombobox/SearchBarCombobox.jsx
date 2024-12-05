@@ -23,14 +23,19 @@ const SearchBarCombobox = ({
       handleSelect(suggestions[activeIndex]);
     } else if (e.key === "Escape") {
       // reset
-      setIsOpen(!isOpen);
-      setActiveIndex(-1);
-      setQuery("");
+      resetSearchBar();
     }
+  };
+
+  const resetSearchBar = () => {
+    setIsOpen(!isOpen);
+    setActiveIndex(-1);
+    setQuery("");
   };
 
   const handleSelect = (suggestion) => {
     onSelect(suggestion);
+    resetSearchBar();
   };
 
   return (
@@ -57,7 +62,14 @@ const SearchBarCombobox = ({
                   activeIndex === index ? "bg-blue-100" : "hover:bg-gray-100"
                 }`}
               >
-                {suggestion.name}
+                <div>
+                  <p className="">{suggestion.name}</p>
+                  {suggestion.type === "restaurant" ? (
+                    <p className="text-gray-500 text-sm">View Restaurant</p>
+                  ) : (
+                    <p className="text-gray-500 text-sm">See Item Restaurant</p>
+                  )}
+                </div>
               </li>
             ))
           ) : (

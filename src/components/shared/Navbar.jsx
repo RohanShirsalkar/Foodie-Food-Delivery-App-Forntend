@@ -8,6 +8,7 @@ import {
   getResultBySearchedQuery,
 } from "../../api/restaurant.api";
 import SearchBarCombobox from "../SearchBarCombobox/SearchBarCombobox";
+import UserMenuDropdown from "./UserMenuDropdown";
 
 const Navbar = () => {
   const { openAuthDialog, openLocationDialog } = useContext(AppContext);
@@ -21,7 +22,6 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const handleSelectSuggestion = (suggestion) => {
-    alert(`Selected: ${suggestion.name}`);
     if (suggestion.type === "restaurant") {
       navigate(`/restaurant/${suggestion.id}`);
     } else {
@@ -83,7 +83,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow-md">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-2">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <Link to={"/"} className="text-2xl font-bold text-gray-800">
@@ -104,7 +104,7 @@ const Navbar = () => {
           </div>
 
           {/* Menu */}
-          <div className="hidden md:flex space-x-6">
+          <div className="hidden md:flex items-center space-x-6">
             <a
               onClick={openLocationDialog}
               className="text-gray-800 font-medium hover:text-blue-500 cursor-pointer"
@@ -117,13 +117,11 @@ const Navbar = () => {
             >
               Cart
             </a>
+
             {loggedIn ? (
-              <a
-                onClick={logout}
-                className="text-gray-800 font-medium hover:text-blue-500 cursor-pointer"
-              >
-                +91 {userPhone} Logout
-              </a>
+              <>
+                <UserMenuDropdown />
+              </>
             ) : (
               <a
                 onClick={openAuthDialog}

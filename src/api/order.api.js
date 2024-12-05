@@ -11,3 +11,8 @@ export const findOrderById = async (id) => {
   const response = await api.get(`${endpoint}/${id}`);
   return response.data;
 };
+
+export const findOrderByUserId = async (userId) => {
+  const response = await api.get(`${endpoint}/user/${userId}`);
+  return response.data;
+};

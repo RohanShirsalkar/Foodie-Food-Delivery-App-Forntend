@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const UserContext = createContext();
 
@@ -8,6 +9,8 @@ export const UserContextProvider = ({ children }) => {
   const [userLocation, setUserLocation] = useState(null);
   const [userPhone, setUserPhone] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
+
+  const navigate = useNavigate();
 
   const setUser = (user, token) => {
     setUserId(user.id);
@@ -21,6 +24,7 @@ export const UserContextProvider = ({ children }) => {
     setAccessToken(null);
     setUserPhone(null);
     setLoggedIn(false);
+    navigate("/");
   };
 
   const values = {
