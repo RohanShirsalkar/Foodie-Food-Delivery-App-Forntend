@@ -7,20 +7,34 @@ import { CartContext } from "../context/CartContext";
 const Restaurant_Page = () => {
   const { addItemToCart, cartId } = useContext(CartContext);
   const [restaurant, setRestaurant] = useState({});
-  const { id } = useParams();
+  const [queryItem, setQueryItem] = useState(null);
+  const { id, itemId } = useParams();
+  console.log(id, itemId);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getRestaurantById(id);
         setRestaurant(response.data);
+        if (itemId) {
+          response.data.menu.forEach((item) => {
+            if (item.id === itemId) {
+              setQueryItem(item);
+            }
+          });
+        }
       } catch (error) {
         console.log(error);
         alert("Error fetching restaurantById");
       }
     };
     fetchData();
-  }, []);
+    return () => {
+      console.log("object");
+      setQueryItem(null);
+      setRestaurant({});
+    };
+  }, [itemId]);
 
   return (
     <div className="py-6">
@@ -58,8 +72,35 @@ const Restaurant_Page = () => {
           </div>
         </div>
 
+        {/* Searched Item  */}
+        {queryItem && (
+          <div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Searched Item
+            </h3>
+            <div className="divide-y divide-gray-200 space-y-2">
+              <MenuItem
+                key={queryItem.id}
+                item={queryItem}
+                onAddToCart={() =>
+                  addItemToCart(
+                    {
+                      cartId: cartId,
+                      menuItemId: queryItem.id,
+                      restaurantId: id,
+                      quantity: 1,
+                    },
+                    restaurant.city
+                  )
+                }
+              />
+            </div>
+          </div>
+        )}
+
         {/* Menu */}
-        <div>
+
+        <div className="mt-4">
           <h3 className="text-xl font-semibold text-gray-800 mb-4">Menu</h3>
           <div className="divide-y divide-gray-200 space-y-2">
             {restaurant?.menu?.map((item) => (
@@ -67,12 +108,15 @@ const Restaurant_Page = () => {
                 key={item.id}
                 item={item}
                 onAddToCart={() =>
-                  addItemToCart({
-                    cartId: cartId,
-                    menuItemId: item.id,
-                    restaurantId: id,
-                    quantity: 1,
-                  })
+                  addItemToCart(
+                    {
+                      cartId: cartId,
+                      menuItemId: item.id,
+                      restaurantId: id,
+                      quantity: 1,
+                    },
+                    restaurant.city
+                  )
                 }
               />
             ))}

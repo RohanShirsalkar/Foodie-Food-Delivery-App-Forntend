@@ -29,6 +29,7 @@ export const UserContextProvider = ({ children }) => {
     setUser,
     loggedIn,
     userLocation,
+    setUserLocation,
     userPhone,
     setLoggedIn,
     logout,

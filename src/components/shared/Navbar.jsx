@@ -1,38 +1,115 @@
-import React, { useContext, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { CartContext } from "../../context/CartContext";
 import { AppContext } from "../../context/AppContext";
 import { UserContext } from "../../context/UserContext";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  getRestaurantByItem,
+  getResultBySearchedQuery,
+} from "../../api/restaurant.api";
+import SearchBarCombobox from "../SearchBarCombobox/SearchBarCombobox";
 
 const Navbar = () => {
-  const { openAuthDialog } = useContext(AppContext);
-  const { userPhone, loggedIn, logout } = useContext(UserContext);
+  const { openAuthDialog, openLocationDialog } = useContext(AppContext);
+  const { userLocation, userPhone, loggedIn, logout } = useContext(UserContext);
   const { toggleCart } = useContext(CartContext);
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isComboBoxOpen, setIsComboBoxOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleSelectSuggestion = (suggestion) => {
+    alert(`Selected: ${suggestion.name}`);
+    if (suggestion.type === "restaurant") {
+      navigate(`/restaurant/${suggestion.id}`);
+    } else {
+      navigate(
+        `/restaurant/${suggestion.restaurantId}/queryItem/${suggestion.id}`
+      );
+    }
+  };
+
+  function debounce(func, delay = 1000) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
+  }
+
+  const debounseResult = useCallback(
+    debounce(async (arg) => {
+      try {
+        const resposne = await getResultBySearchedQuery(arg);
+        console.log(resposne.data.menuItems);
+        const updatedRestaurants = resposne.data.restaurants.map(
+          (restaurant) => {
+            return {
+              ...restaurant,
+              type: "restaurant",
+            };
+          }
+        );
+        const updatedMenuItems = resposne.data.menuItems.map((menuItem) => {
+          return {
+            ...menuItem,
+            type: "menuItem",
+          };
+        });
+        setSearchResults([...updatedRestaurants, ...updatedMenuItems]);
+      } catch (error) {
+        console.log(error);
+        alert("Error in fetching data");
+      }
+    }, 1000),
+    []
+  );
+
+  const handleSearch = (e) => {
+    let value = e.target.value;
+    setQuery(value);
+    if (value) {
+      setIsComboBoxOpen(true);
+      debounseResult(value);
+    } else {
+      setSearchResults([]);
+      setIsComboBoxOpen(false);
+    }
+  };
 
   return (
     <nav className="bg-white shadow-md">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <div className="text-2xl font-bold text-gray-800">Foodie</div>
+          <Link to={"/"} className="text-2xl font-bold text-gray-800">
+            Foodie
+          </Link>
 
-          {/* Search Bar (Desktop Only) */}
-          <div className="hidden md:flex flex-1 mx-8">
-            <input
-              type="text"
-              placeholder="Search for restaurants or dishes..."
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+          {/* Search Bar ComboBox */}
+          <div className=" hidden md:flex flex-1 mx-8">
+            <SearchBarCombobox
+              isOpen={isComboBoxOpen}
+              setIsOpen={setIsComboBoxOpen}
+              query={query}
+              setQuery={setQuery}
+              suggestions={searchResults}
+              onSelect={handleSelectSuggestion}
+              handleInputChange={handleSearch}
             />
           </div>
 
           {/* Menu */}
           <div className="hidden md:flex space-x-6">
             <a
-              href="/"
-              className="text-gray-800 font-medium hover:text-blue-500"
+              onClick={openLocationDialog}
+              className="text-gray-800 font-medium hover:text-blue-500 cursor-pointer"
             >
-              📍Select Location
+              {userLocation ? `📍${userLocation}` : "📍Select Location"}
             </a>
             <a
               className="text-gray-800 font-medium hover:text-blue-500 cursor-pointer"
@@ -96,7 +173,7 @@ const Navbar = () => {
           <div className="px-4 py-2">
             <input
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={handleSearch}
               type="text"
               placeholder="Search for restaurants or dishes..."
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"

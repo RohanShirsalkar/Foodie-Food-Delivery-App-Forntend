@@ -6,7 +6,7 @@ const Auth_Container = () => {
   const { isAuthDialogOpen, closeAuthDialog } = useContext(AppContext);
 
   return (
-    <div className="p-6">
+    <div>
       <Auth_Dialog isOpen={isAuthDialogOpen} onClose={closeAuthDialog} />
     </div>
   );

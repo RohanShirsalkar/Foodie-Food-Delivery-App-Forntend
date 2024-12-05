@@ -5,6 +5,7 @@ export const AppContext = createContext();
 export const AppContextProvider = ({ children }) => {
   const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const [isLocationDialogOpen, setIsLocationDialogOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
 
   const openAddressDialog = () => {
@@ -19,6 +20,12 @@ export const AppContextProvider = ({ children }) => {
   const closeAuthDialog = () => {
     setIsAuthDialogOpen(false);
   };
+  const openLocationDialog = () => {
+    setIsLocationDialogOpen(true);
+  };
+  const closeLocationDialog = () => {
+    setIsLocationDialogOpen(false);
+  };
 
   const values = {
     isAddressDialogOpen,
@@ -30,6 +37,9 @@ export const AppContextProvider = ({ children }) => {
     isAuthDialogOpen,
     openAuthDialog,
     closeAuthDialog,
+    isLocationDialogOpen,
+    openLocationDialog,
+    closeLocationDialog,
   };
   return <AppContext.Provider value={values}>{children}</AppContext.Provider>;
 };

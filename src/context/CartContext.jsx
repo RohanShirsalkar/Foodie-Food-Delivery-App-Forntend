@@ -18,9 +18,8 @@ export const CartContextProvider = ({ children }) => {
   const [cartId, setCartId] = useState(null);
   const [restaurantId, setRestaurantId] = useState("");
 
+  const { userId, loggedIn, userLocation } = useContext(UserContext);
   const navigate = useNavigate();
-
-  const { userId, loggedIn } = useContext(UserContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,9 +45,13 @@ export const CartContextProvider = ({ children }) => {
     setIsCartOpen(!isCartOpen);
   };
 
-  const addItemToCart = async (data) => {
+  const addItemToCart = async (data, restaurantlocation) => {
     if (!loggedIn) {
       alert("Please sign in to add items");
+      return;
+    }
+    if (userLocation !== restaurantlocation) {
+      alert("You are not allowed to add items from this location");
       return;
     }
     try {
