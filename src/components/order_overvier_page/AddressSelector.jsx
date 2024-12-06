@@ -3,8 +3,8 @@ import { AppContext } from "../../context/AppContext";
 
 const AddressSelector = ({
   addresses,
-  selectedAddressId,
-  setSelectedAddressId,
+  selectedAddress,
+  setSelectedAddress,
 }) => {
   const { openAddressDialog } = useContext(AppContext);
   return (
@@ -20,9 +20,9 @@ const AddressSelector = ({
             {addresses?.map((address) => (
               <li
                 key={address.id}
-                onClick={() => setSelectedAddressId(address.id)}
+                onClick={() => setSelectedAddress(address)}
                 className={`p-4 rounded-lg cursor-pointer ${
-                  selectedAddressId === address.id
+                  selectedAddress?.id === address?.id
                     ? "bg-blue-100 border border-blue-500"
                     : "bg-gray-100 hover:bg-gray-200"
                 }`}

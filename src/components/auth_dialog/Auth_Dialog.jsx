@@ -9,6 +9,7 @@ const Auth_Dialog = ({ isOpen, onClose }) => {
     phone: "",
     email: "",
     password: "",
+    name: "",
   });
 
   const handleInputChange = (e) => {
@@ -17,33 +18,31 @@ const Auth_Dialog = ({ isOpen, onClose }) => {
   };
 
   const handleSubmit = async () => {
-    const { phone, email, password } = formData;
-
-    if (!phone || !password || (!isLogin && !email)) {
+    const { phone, email, password, name } = formData;
+    if (!phone || !password || (!isLogin && !name) || (!isLogin && !email)) {
       alert("Please fill in all required fields.");
       return;
     }
 
     if (isLogin) {
-      // Add login logic here
       try {
         const response = await loginUser({ phone, password });
         console.log(response);
         setUser(response.data.user, response.data.token);
         onClose();
-        // setFormData({ phone: "", email: "", password: "" });
+        setFormData({ phone: "", email: "", password: "", name: "" });
       } catch (error) {
         console.log(error);
         alert(error.response.data.message);
       }
     } else {
       try {
-        const response = await registerUser({ phone, email, password });
+        const response = await registerUser({ phone, email, password, name });
         setUser(response.user, response.token);
         console.log(response);
         alert("User registered successfully.");
         onClose();
-        // setFormData({ phone: "", email: "", password: "" });
+        setFormData({ phone: "", email: "", password: "", name: "" });
       } catch (error) {
         console.log(error);
         alert(error.response.data.message);
@@ -82,6 +81,25 @@ const Auth_Dialog = ({ isOpen, onClose }) => {
 
         {/* Form */}
         <div className="space-y-4">
+          {!isLogin && (
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Name
+              </label>
+              <input
+                type="name"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Enter your name"
+              />
+            </div>
+          )}
           <div>
             <label
               htmlFor="phone"

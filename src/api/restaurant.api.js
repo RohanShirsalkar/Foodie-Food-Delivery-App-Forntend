@@ -12,8 +12,10 @@ export const getRestaurantById = async (id) => {
   return response.data;
 };
 
-export const getResultBySearchedQuery = async (query) => {
-  const response = await api.get(`${endpoint}/search-item/${query}`);
+export const getResultBySearchedQuery = async (query, location) => {
+  const response = await api.get(
+    `${endpoint}/search-item/${query}/${location}`
+  );
   return response.data;
 };
 

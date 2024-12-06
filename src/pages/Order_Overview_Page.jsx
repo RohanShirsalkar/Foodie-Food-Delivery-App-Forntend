@@ -10,7 +10,7 @@ import PaymentSelector from "../components/order_overvier_page/PaymentSelector";
 import CouponSelector from "../components/order_overvier_page/CouponSelector";
 
 const Order_Overview_Page = () => {
-  const { userId } = useContext(UserContext);
+  const { userId, userLocation } = useContext(UserContext);
   const {
     cartItems,
     totalPrice,
@@ -18,10 +18,11 @@ const Order_Overview_Page = () => {
     increaseItemQuantity,
     decreaseItemQuantity,
     restaurantId,
+    restaurantlocation,
     setCart,
   } = useContext(CartContext);
   const { addresses, setAddresses } = useContext(AppContext);
-  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [grandTotal, setGrandTotal] = useState(0);
@@ -43,7 +44,6 @@ const Order_Overview_Page = () => {
         setGrandTotal(totalPrice - couponDiscount + deliveryFee);
       }
     } else {
-      console.log(totalPrice, deliveryFee, totalPrice + deliveryFee);
       setGrandTotal(totalPrice + deliveryFee);
     }
   }, [selectedCoupon, totalPrice]);
@@ -58,16 +58,26 @@ const Order_Overview_Page = () => {
         alert("Error fetching addresses");
       }
     };
-    fetchData();
-  }, []);
+    if (userId) {
+      fetchData();
+    }
+  }, [userId]);
 
   const handlePlaceOrder = async () => {
     if (!selectedMethod) {
       alert("Please select a delivery method");
       return;
     }
-    if (!selectedAddressId) {
+    if (!selectedAddress) {
       alert("Please select an address");
+      return;
+    }
+    if (restaurantlocation !== userLocation) {
+      alert("Restaurant is not available in your current location");
+      return;
+    }
+    if (userLocation !== selectedAddress?.city) {
+      alert("Please select an address in your current location");
       return;
     }
     try {
@@ -76,8 +86,8 @@ const Order_Overview_Page = () => {
         restaurantId,
         paymentMethod: selectedMethod,
         deliveryCharges: deliveryFee,
-        addressId: selectedAddressId,
-        couponId: selectedCoupon.id,
+        addressId: selectedAddress?.id,
+        couponId: selectedCoupon?.id || null,
       });
       alert("Order placed successfully");
       setCart(response.data.updatedCart);
@@ -155,8 +165,8 @@ const Order_Overview_Page = () => {
 
       <AddressSelector
         addresses={addresses}
-        selectedAddressId={selectedAddressId}
-        setSelectedAddressId={setSelectedAddressId}
+        selectedAddress={selectedAddress}
+        setSelectedAddress={setSelectedAddress}
       />
 
       <CouponSelector

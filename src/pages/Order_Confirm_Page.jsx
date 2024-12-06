@@ -60,7 +60,7 @@ const Order_Confirm_Page = () => {
               className="flex justify-between items-center bg-gray-100 p-4 rounded-lg"
             >
               <div>
-                <h3 className="font-semibold">{item?.id}</h3>
+                <h3 className="font-semibold">{item?.name}</h3>
                 <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
               </div>
               <p className="font-bold">
@@ -83,6 +83,10 @@ const Order_Confirm_Page = () => {
             <span>Delivery Fee</span>
             <span>${orderDetails.deliveryCharges}</span>
           </div>
+          {/* <div className="flex justify-between">
+            <span >Coupon Discount</span>
+            <span>${orderDetails.total - orderDetails.cartTotal}</span>
+          </div> */}
           <div className="border-t pt-2 flex justify-between font-bold">
             <span>Total</span>
             <span>${orderDetails.total}</span>

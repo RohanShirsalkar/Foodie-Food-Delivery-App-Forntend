@@ -17,11 +17,13 @@ export const CartContextProvider = ({ children }) => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [cartId, setCartId] = useState(null);
   const [restaurantId, setRestaurantId] = useState("");
+  const [restaurantlocation, setRestaurantLocation] = useState("");
 
   const { userId, loggedIn, userLocation } = useContext(UserContext);
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log(loggedIn);
     const fetchData = async () => {
       try {
         const response = await findCartByUserId(userId);
@@ -45,18 +47,18 @@ export const CartContextProvider = ({ children }) => {
     setIsCartOpen(!isCartOpen);
   };
 
-  const addItemToCart = async (data, restaurantlocation) => {
+  const addItemToCart = async (data, restaurant_location) => {
     if (!loggedIn) {
       alert("Please sign in to add items");
       return;
     }
-    if (userLocation !== restaurantlocation) {
+    if (userLocation !== restaurant_location) {
       alert("You are not allowed to add items from this location");
       return;
     }
     try {
       const response = await createCartItem(data);
-      setCart(response.data);
+      setCart(response.data, restaurant_location);
       alert("Item added successfully");
     } catch (error) {
       console.log(error);
@@ -107,12 +109,13 @@ export const CartContextProvider = ({ children }) => {
     setIsCartOpen(false);
   };
 
-  const setCart = (cart) => {
+  const setCart = (cart, restaurant_location) => {
     setCartItems(cart.cartItem);
     setCartId(cart.id);
     setTotalPrice(cart.total);
     if (cart?.cartItem[0]?.restaurantId) {
       setRestaurantId(cart.cartItem[0].restaurantId);
+      setRestaurantLocation(restaurant_location);
     }
   };
 
@@ -140,6 +143,7 @@ export const CartContextProvider = ({ children }) => {
     increaseItemQuantity,
     decreaseItemQuantity,
     restaurantId,
+    restaurantlocation,
   };
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };

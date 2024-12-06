@@ -2,18 +2,20 @@ import React, { useContext, useState } from "react";
 import { UserContext } from "../../context/UserContext";
 
 const Location_Dialog = ({ isOpen, onClose, onSelectLocation }) => {
-  const { userLocation, setUserLocation } = useContext(UserContext);
+  const { userLocation, setUserLocation, setLocation } =
+    useContext(UserContext);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const locations = ["Nagpur", "Bangalore", "Chennai ", "Delhi"];
+  const locations = ["Nagpur", "Bangalore", "Chennai ", "Mumbai"];
 
   const filteredLocations = locations.filter((location) =>
     location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleSelect = (location) => {
-    setUserLocation(location);
+    // setUserLocation(location);
     onSelectLocation(location);
+    setLocation(location);
     onClose();
   };
 

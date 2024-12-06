@@ -52,7 +52,7 @@ const SearchBarCombobox = ({
 
       {/* Suggestions Dropdown */}
       {isOpen && (
-        <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+        <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-[400px] overflow-auto">
           {suggestions?.length > 0 ? (
             suggestions?.map((suggestion, index) => (
               <li
@@ -65,9 +65,11 @@ const SearchBarCombobox = ({
                 <div>
                   <p className="">{suggestion.name}</p>
                   {suggestion.type === "restaurant" ? (
-                    <p className="text-gray-500 text-sm">View Restaurant</p>
+                    <p className="text-green-500 text-sm">View restaurant</p>
                   ) : (
-                    <p className="text-gray-500 text-sm">See Item Restaurant</p>
+                    <p className="text-gray-500 text-sm">
+                      See item in restaurant
+                    </p>
                   )}
                 </div>
               </li>

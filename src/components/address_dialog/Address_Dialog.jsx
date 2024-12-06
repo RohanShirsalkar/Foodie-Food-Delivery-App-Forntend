@@ -10,6 +10,7 @@ const Address_Dialog = ({ isOpen, onClose }) => {
     city: "",
     street: "",
     pinCode: "",
+    label: "",
   });
 
   const handleInputChange = (e) => {
@@ -18,7 +19,12 @@ const Address_Dialog = ({ isOpen, onClose }) => {
   };
 
   const handleSave = async () => {
-    if (!formData.city || !formData.street || !formData.pinCode) {
+    if (
+      !formData.city ||
+      !formData.street ||
+      !formData.pinCode ||
+      !formData.label
+    ) {
       alert("Please fill all fields.");
       return;
     }
@@ -26,7 +32,7 @@ const Address_Dialog = ({ isOpen, onClose }) => {
       const response = await createAddress({ ...formData, userId });
       alert("Address created successfully.");
       setAddresses(response.data);
-      setFormData({ city: "", street: "", pinCode: "" });
+      setFormData({ city: "", street: "", pinCode: "", lable: "" });
     } catch (error) {
       console.log(error);
       alert("Error occurred while creating address.");
@@ -40,6 +46,23 @@ const Address_Dialog = ({ isOpen, onClose }) => {
         <h2 className="text-xl font-bold mb-4">Add New Address</h2>
         {/* Form */}
         <div className="space-y-4">
+          <div>
+            <label
+              htmlFor="label"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Save as
+            </label>
+            <input
+              type="text"
+              id="label"
+              name="label"
+              value={formData.label}
+              onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="Enter label for address"
+            />
+          </div>
           <div>
             <label
               htmlFor="city"

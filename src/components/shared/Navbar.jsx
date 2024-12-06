@@ -42,10 +42,10 @@ const Navbar = () => {
   }
 
   const debounseResult = useCallback(
-    debounce(async (arg) => {
+    debounce(async (arg, location) => {
+      console.log(location);
       try {
-        const resposne = await getResultBySearchedQuery(arg);
-        console.log(resposne.data.menuItems);
+        const resposne = await getResultBySearchedQuery(arg, location);
         const updatedRestaurants = resposne.data.restaurants.map(
           (restaurant) => {
             return {
@@ -60,7 +60,7 @@ const Navbar = () => {
             type: "menuItem",
           };
         });
-        setSearchResults([...updatedRestaurants, ...updatedMenuItems]);
+        setSearchResults([...updatedMenuItems, ...updatedRestaurants]);
       } catch (error) {
         console.log(error);
         alert("Error in fetching data");
@@ -72,9 +72,10 @@ const Navbar = () => {
   const handleSearch = (e) => {
     let value = e.target.value;
     setQuery(value);
+
     if (value) {
       setIsComboBoxOpen(true);
-      debounseResult(value);
+      debounseResult(value, userLocation);
     } else {
       setSearchResults([]);
       setIsComboBoxOpen(false);
@@ -105,12 +106,12 @@ const Navbar = () => {
 
           {/* Menu */}
           <div className="hidden md:flex items-center space-x-6">
-            <a
+            {/* <a
               onClick={openLocationDialog}
               className="text-gray-800 font-medium hover:text-blue-500 cursor-pointer"
             >
               {userLocation ? `📍${userLocation}` : "📍Select Location"}
-            </a>
+            </a> */}
             <a
               className="text-gray-800 font-medium hover:text-blue-500 cursor-pointer"
               onClick={toggleCart}

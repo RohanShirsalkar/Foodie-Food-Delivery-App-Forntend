@@ -86,6 +86,7 @@ const Restaurant_Page = () => {
                   addItemToCart(
                     {
                       cartId: cartId,
+                      name: queryItem.name,
                       menuItemId: queryItem.id,
                       restaurantId: id,
                       quantity: 1,
@@ -111,6 +112,7 @@ const Restaurant_Page = () => {
                   addItemToCart(
                     {
                       cartId: cartId,
+                      name: item.name,
                       menuItemId: item.id,
                       restaurantId: id,
                       quantity: 1,

@@ -81,7 +81,7 @@ const Order_History = () => {
                 <ul className="list-disc pl-5 text-gray-700">
                   {order.orderItem.map((item) => (
                     <li key={item.id}>
-                      {item.quantity} x {item.id}
+                      {item.quantity} x {item.name}
                     </li>
                   ))}
                 </ul>
